@@ -1,5 +1,7 @@
 package com.glasses.programmieraufgabe3;
 
+import java.io.FileReader;
+
 /**
  *
  * @author Jean-Luc Burot

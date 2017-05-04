@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import org.jsoup.Jsoup;
 
 /**
  *
@@ -34,7 +35,7 @@ public class FileReader {
         this.address = address;
     }
     
-    public void read() throws FileNotFoundException, IOException {
+    public void read(boolean removeXml) throws FileNotFoundException, IOException {
         // Variable for each line in the document.
         String lineContent = "";
         // Re-initialize the array of lines.
@@ -45,6 +46,12 @@ public class FileReader {
         
         // Add all found lines to the array of lines.
         while((lineContent = br.readLine()) != null) {
+            if(removeXml) {
+                // Remove XML tags.
+                lineContent = Jsoup.parse(lineContent).text();
+            }
+            
+            // Add single line to array.
             this.lines.add(lineContent);
         }
     }

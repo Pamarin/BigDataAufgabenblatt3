@@ -15,6 +15,15 @@ import org.elasticsearch.action.search.SearchResponse;
  * @since 2017-05-04
  */
 public class Main {
+    // Server settings.
+    static final String HOST = "localhost";
+    static final int PORT = 9300;
+    
+    // File settings.
+    static final String FILE_DOCUMENTS = "/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/documents.json";
+    static final String FILE_QUERIES = "/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/queries.tsv";
+    static final String FILE_JUDGEMENTS = "/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/judgments.tsv";
+    
     // List of possible commands given through the command line.
     static final String INDEX_DOCUMENTS = "index_documents";
     static final String PROCESS_QUERIES = "process_queries";
@@ -51,10 +60,10 @@ public class Main {
         System.out.println("Dokumente indexieren.");
         
         // Connect to Elasticsearch node.
-        ElasticsearchClient client = new ElasticsearchClient("localhost", 9300);
+        ElasticsearchClient client = new ElasticsearchClient(HOST, PORT);
 
         // Access file.
-        FileReader reader = new FileReader("/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/documents.json");
+        FileReader reader = new FileReader(FILE_DOCUMENTS);
         // Read file.
         reader.read(true);
         System.out.println("Gefundene Zeilen: " + reader.getLines().size());
@@ -80,13 +89,13 @@ public class Main {
         ArrayList<Judgement> judgements = new ArrayList<>();
         
         // Access queries file.
-        FileReader readerQueries = new FileReader(("/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/queries.tsv"));
+        FileReader readerQueries = new FileReader((FILE_QUERIES));
         // Read queries file.
         readerQueries.read(false);
         System.out.println("Gefundene Queries: " + readerQueries.getLines().size());
         
         // Access judgements file.
-        FileReader readerJudgements = new FileReader(("/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/judgments.tsv"));
+        FileReader readerJudgements = new FileReader((FILE_JUDGEMENTS));
         // Read judgements file.
         readerJudgements.read(false);
         System.out.println("Gefundene Judgements: " + readerJudgements.getLines().size());
@@ -116,7 +125,7 @@ public class Main {
         System.out.println("Relevante Judgements: " + judgements.size());
         
         // Connect to Elasticsearch node.
-        ElasticsearchClient client = new ElasticsearchClient("localhost", 9300);
+        ElasticsearchClient client = new ElasticsearchClient(HOST, PORT);
         
         // Define search terms.
         String searchTerms = "International Organized Crime";

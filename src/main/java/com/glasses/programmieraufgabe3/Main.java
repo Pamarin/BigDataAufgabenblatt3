@@ -42,7 +42,7 @@ public class Main {
                     System.out.println("Fehler: '" + command + "' ist kein gültiger Befehl.");
             }
         } else {
-            System.out.println("Fehler: Parameter Befehl fehlt: index_documents");
+            System.out.println("Fehler: Parameter Befehl fehlt: " + INDEX_DOCUMENTS + " oder " + PROCESS_QUERIES);
         }
     }
     

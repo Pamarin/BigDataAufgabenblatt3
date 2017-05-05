@@ -1,4 +1,4 @@
-package Business;
+package com.glasses.programmieraufgabe3.Business;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

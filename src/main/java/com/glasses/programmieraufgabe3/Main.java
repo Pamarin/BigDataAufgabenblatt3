@@ -1,7 +1,7 @@
 package com.glasses.programmieraufgabe3;
 
-import Business.ElasticsearchClient;
-import Business.FileReader;
+import com.glasses.programmieraufgabe3.Business.ElasticsearchClient;
+import com.glasses.programmieraufgabe3.Business.FileReader;
 import com.glasses.programmieraufgabe3.Model.Document;
 import java.io.IOException;
 

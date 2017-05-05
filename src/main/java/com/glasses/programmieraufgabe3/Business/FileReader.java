@@ -1,4 +1,4 @@
-package Business;
+package com.glasses.programmieraufgabe3.Business;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

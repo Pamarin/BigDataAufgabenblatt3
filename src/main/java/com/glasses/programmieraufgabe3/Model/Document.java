@@ -1,5 +1,9 @@
 package com.glasses.programmieraufgabe3.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -8,16 +12,17 @@ import java.util.Date;
  * @since 2017-05-04
  */
 public class Document {
-    private long id;
+    private String id;
     private String title;
+    @JsonProperty(value = "pub-date")
     private Date pubDate;
     private String content;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -45,11 +50,33 @@ public class Document {
         this.content = content;
     }
     
-    public Document(long id, String title, Date pubDate, String content) {
+    public Document() {}
+    
+    public Document(String id, String title, Date pubDate, String content) {
         this.id = id;
         this.title = title;
         this.pubDate = pubDate;
         this.content = content;
+    }
+    
+    public static Document parse(String json) throws IOException {
+        // Create Jackson mapper for parsing.
+        ObjectMapper mapper = new ObjectMapper();
+        
+        // Parse JSON to Document type.
+        Document document = mapper.readValue(json, Document.class);
+        
+        return document;
+    }
+    
+    public String toJSON() throws JsonProcessingException {
+        // Create Jackson mapper for parsing.
+        ObjectMapper mapper = new ObjectMapper();
+        
+        // Parse Document type to JSON.
+        String json = mapper.writeValueAsString(this);
+        
+        return json;
     }
 
     @Override

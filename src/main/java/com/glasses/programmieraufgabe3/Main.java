@@ -1,6 +1,8 @@
 package com.glasses.programmieraufgabe3;
 
+import Business.ElasticsearchClient;
 import Business.FileReader;
+import com.glasses.programmieraufgabe3.Model.Document;
 import java.io.IOException;
 
 
@@ -11,14 +13,29 @@ import java.io.IOException;
  * @since 2017-05-04
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, Exception {
         System.out.println("Willkommen bei Programmieraufgabe 3!");
         
+        // Connect to Elasticsearch node.
+        ElasticsearchClient client = new ElasticsearchClient("localhost", 9300);
+        
+        // Access file.
         FileReader reader = new FileReader("/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/documents.json");
+        // Read file.
         reader.read(true);
         
+        // Iterate through every line.
         for(String line : reader.getLines()) {
-            System.out.println(line);
+            // Parse from JSON to Document class.
+            Document document = Document.parse(line);
+            
+            // Index document.
+            client.index(document.toJSON(), "documents", "document", document.getId());
+            
+            break;
         }
+        
+        // Close connection.
+        client.closeConnection();
     }
 }

@@ -54,7 +54,7 @@ public class ElasticsearchClient {
     }
     
     public IndexResponse index(String json, String index, String type, String id) {
-        System.out.println("Indexing JSON.");
+        System.out.println("Indexing index '" + index + "', type '" + type + "', id '" + id + "'.");
         
         // Index json and get response.
         IndexResponse response = client.prepareIndex(index, type, id)

@@ -2,10 +2,21 @@ package com.glasses.programmieraufgabe3.Business;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.ScriptType;
+import org.elasticsearch.script.mustache.SearchTemplateRequestBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 /**
@@ -60,6 +71,60 @@ public class ElasticsearchClient {
         IndexResponse response = client.prepareIndex(index, type, id)
                                        .setSource(json)
                                        .get();
+        
+        return response;
+    }
+    
+    public SearchResponse search(String index, String type, String fieldToSearchIn, String searchTerms, List<String> relevantIds) {
+        // Query for Elasticsearch.
+        // For more information Elasticsearch API query building: https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-search.html
+        /*
+        SearchResponse response = this.client.prepareSearch(index)
+                                             .setTypes(type)
+                                             .setQuery(QueryBuilders.termsQuery(fieldToSearchIn, searchTerms))
+                                             .get();
+        */
+        
+        // Convert relevantIds array to JSON array.
+        String relevantIdsString = "[";
+        for(int i=0; i<relevantIds.size(); i++) {
+            // If not the first entry, add a comma.
+            if(i>0) {
+                relevantIdsString += ", ";
+            }
+            
+            // Add relevant id.
+            relevantIdsString += "\"" + relevantIds.get(i) + "\"";
+        }
+        relevantIdsString += "]";
+        
+        // Generate search script.
+        String searchScript = "{\n" +
+                              "  \"query\": {\n" +
+                              "    \"bool\": {\n" +
+                              "      \"should\": {\n" +
+                              "        \"match\": {\n" +
+                              "          \"content\": \"" + searchTerms + "\"\n" +
+                              "        }\n" +
+                              "      },\n" +
+                              "      \"filter\": {\n" +
+                              "        \"terms\": {\n" +
+                              "          \"_id\": " + relevantIdsString + "\n" +
+                              "\n" +
+                              "        }\n" +
+                              "      }\n" +
+                              "    }\n" +
+                              "  }\n" +
+                              "}\n" +
+                              "'";
+        
+        // Search in Elasticsearch.
+        SearchResponse response = new SearchTemplateRequestBuilder(client)
+                                        .setScript(searchScript)
+                                        .setScriptType(ScriptType.INLINE)
+                                        .setRequest(new SearchRequest())
+                                        .get()
+                                        .getResponse();
         
         return response;
     }

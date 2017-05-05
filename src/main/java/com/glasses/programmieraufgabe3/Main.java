@@ -7,6 +7,7 @@ import com.glasses.programmieraufgabe3.Model.Judgement;
 import com.glasses.programmieraufgabe3.Model.Query;
 import java.io.IOException;
 import java.util.ArrayList;
+import org.elasticsearch.action.search.SearchResponse;
 
 /**
  *
@@ -71,7 +72,7 @@ public class Main {
         client.closeConnection();
     }
     
-    private static void processQueries() throws IOException {
+    private static void processQueries() throws IOException, Exception {
         System.out.println("Queries verarbeiten.");
         
         // Lists for queries and judgements.
@@ -113,5 +114,24 @@ public class Main {
         }
         
         System.out.println("Relevante Judgements: " + judgements.size());
+        
+        // Connect to Elasticsearch node.
+        ElasticsearchClient client = new ElasticsearchClient("localhost", 9300);
+        
+        // Define search terms.
+        String searchTerms = "International Organized Crime";
+        
+        // Define the indices.
+        ArrayList<String> relevantIds = new ArrayList<>();
+        relevantIds.add("CR93E-1282");
+        relevantIds.add("CR93E-3103");
+        relevantIds.add("CR93E-5796");
+        
+        // Search in Elasticsearch.
+        SearchResponse response = client.search("documents", "document", "title", searchTerms, relevantIds);
+        System.out.println(response);
+        
+        // Close connection.
+        client.closeConnection();
     }
 }

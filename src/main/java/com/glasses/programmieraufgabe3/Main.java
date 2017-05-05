@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class Main {
     public static void main(String[] args) throws IOException, Exception {
-        System.out.println("Willkommen bei Programmieraufgabe 3!");
+        System.out.println("Willkommen bei Big Data - Programmieraufgabe 3!");
         
         // Connect to Elasticsearch node.
         ElasticsearchClient client = new ElasticsearchClient("localhost", 9300);
@@ -23,6 +23,7 @@ public class Main {
         FileReader reader = new FileReader("/home/jean/Schreibtisch/Big Data/Aufgabenblatt 3/assignment1-data/documents.json");
         // Read file.
         reader.read(true);
+        System.out.println("Gefundene Zeilen: " + reader.getLines().size());
         
         // Iterate through every line.
         for(String line : reader.getLines()) {
@@ -31,8 +32,6 @@ public class Main {
             
             // Index document.
             client.index(document.toJSON(), "documents", "document", document.getId());
-            
-            break;
         }
         
         // Close connection.

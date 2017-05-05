@@ -2,6 +2,7 @@ package Business;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
@@ -50,6 +51,17 @@ public class ElasticsearchClient {
         } else {
             throw new Exception("Connection still open.");
         }
+    }
+    
+    public IndexResponse index(String json, String index, String type, String id) {
+        System.out.println("Indexing JSON.");
+        
+        // Index json and get response.
+        IndexResponse response = client.prepareIndex(index, type, id)
+                                       .setSource(json)
+                                       .get();
+        
+        return response;
     }
     
     public void closeConnection() throws Exception {

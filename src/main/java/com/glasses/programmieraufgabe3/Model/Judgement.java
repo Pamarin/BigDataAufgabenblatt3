@@ -33,6 +33,12 @@ public class Judgement {
     public void setRelevance(boolean relevance) {
         this.relevance = relevance;
     }
+    
+    public Judgement(long id, long documentId, boolean relevance) {
+        this.id = id;
+        this.documentId = documentId;
+        this.relevance = relevance;
+    }
 
     @Override
     public String toString() {

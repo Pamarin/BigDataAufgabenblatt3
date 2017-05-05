@@ -42,6 +42,13 @@ public class Query {
     public void setNarrative(String narrative) {
         this.narrative = narrative;
     }
+    
+    public Query(long id, String title, String description, String narrative) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.narrative = narrative;
+    }
 
     @Override
     public String toString() {

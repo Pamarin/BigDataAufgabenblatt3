@@ -44,6 +44,13 @@ public class Document {
     public void setContent(String content) {
         this.content = content;
     }
+    
+    public Document(long id, String title, Date pubDate, String content) {
+        this.id = id;
+        this.title = title;
+        this.pubDate = pubDate;
+        this.content = content;
+    }
 
     @Override
     public String toString() {

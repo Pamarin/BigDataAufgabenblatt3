@@ -49,6 +49,14 @@ public class Query {
         this.description = description;
         this.narrative = narrative;
     }
+    
+    public static Query parse(String tsvLine) {
+        // Split line by tabulator.
+        String[] cells = tsvLine.split("\t");
+        
+        // Create new Query object and return it.
+        return new Query(Integer.parseInt(cells[0]), cells[1], cells[2], cells[3]);
+    }
 
     @Override
     public String toString() {

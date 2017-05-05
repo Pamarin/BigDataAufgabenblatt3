@@ -7,7 +7,7 @@ package com.glasses.programmieraufgabe3.Model;
  */
 public class Judgement {
     private long id;
-    private long documentId;
+    private String documentId;
     private boolean relevance;
 
     public long getId() {
@@ -18,11 +18,11 @@ public class Judgement {
         this.id = id;
     }
 
-    public long getDocumentId() {
+    public String getDocumentId() {
         return documentId;
     }
 
-    public void setDocumentId(long documentId) {
+    public void setDocumentId(String documentId) {
         this.documentId = documentId;
     }
 
@@ -34,10 +34,18 @@ public class Judgement {
         this.relevance = relevance;
     }
     
-    public Judgement(long id, long documentId, boolean relevance) {
+    public Judgement(long id, String documentId, boolean relevance) {
         this.id = id;
         this.documentId = documentId;
         this.relevance = relevance;
+    }
+    
+    public static Judgement parse(String tsvLine) {
+        // Split line by tabulator.
+        String[] cells = tsvLine.split("\t");
+        
+        // Create new Judgement object and return it.
+        return new Judgement(Integer.parseInt(cells[0]), cells[1], "1".equals(cells[2]));
     }
 
     @Override

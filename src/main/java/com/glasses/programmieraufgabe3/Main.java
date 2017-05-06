@@ -8,6 +8,7 @@ import com.glasses.programmieraufgabe3.Model.Query;
 import com.glasses.programmieraufgabe3.Model.QueryResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.sound.midi.SysexMessage;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
 
@@ -28,6 +29,8 @@ public class Main {
     
     // List of possible commands given through the command line.
     static final String INDEX_DOCUMENTS = "index_documents";
+    static final String INDEX_DOCUMENTS_WITHOUT_STOP_WORD = "without_stop_word";
+    static final String INDEX_DOCUMENTS_WITH_STOP_WORD = "with_stop_word";
     static final String PROCESS_QUERIES = "process_queries";
     public static final String PROCESS_QUERIES_BOOLEAN = "boolean";
     public static final String PROCESS_QUERIES_TF_IDF = "tfidf";
@@ -46,34 +49,46 @@ public class Main {
             // Get the first command from the command line.
             String command = args[0];
             
-            // Connect to Elasticsearch node.
-            ElasticsearchClient client = new ElasticsearchClient(HOST, PORT);
+            // Check if two arguments have been given.
+            if(args.length > 1) {
+                // Connect to Elasticsearch node.
+                ElasticsearchClient client = new ElasticsearchClient(HOST, PORT);
 
-            // Start the appriate part.
-            switch(args[0]) {
-                case INDEX_DOCUMENTS:
-                    // Index the documents.
-                    indexDocuments(client);
-                    break;
-                case PROCESS_QUERIES:
-                    // Check if two arguments have been given.
-                    if(args.length > 1) {
+                // Start the appriate part.
+                switch(args[0]) {
+                    case INDEX_DOCUMENTS:
+                        // Get the second command from command line.
+                        String havingStopWord = args[1];
+                        // Index the documents.
+                        indexDocuments(client);
+                        break;
+                    case PROCESS_QUERIES:
                         // Get the second command from command line.
                         String algorithm = args[1];
                         // Process the queries.
                         processQueries(client, algorithm);
-                    } else {
-                        System.out.println("Fehler: Dem ersten Parameter " + PROCESS_QUERIES + " fehlt noch der zweite Parameter Suchart: [" + PROCESS_QUERIES_BOOLEAN + ", " + PROCESS_QUERIES_TF_IDF + ", " + PROCESS_QUERIES_BM25 + "]");
-                    }
-                    break;
-                default:
-                    System.out.println("Fehler: '" + command + "' ist kein gültiger Befehl.");
+                        break;
+                    default:
+                        System.out.println("Fehler: '" + command + "' ist kein gültiger Befehl.");
+                }
+
+                // Close connection.
+                client.closeConnection();
+            } else {
+                System.out.print("Fehler: Zweiter Parameter fehlt: ");
+                switch(command) {
+                    case INDEX_DOCUMENTS:
+                        System.out.println("[" + INDEX_DOCUMENTS_WITHOUT_STOP_WORD + ", " + INDEX_DOCUMENTS_WITH_STOP_WORD + "]");
+                        break;
+                    case PROCESS_QUERIES:
+                        System.out.println("[" + PROCESS_QUERIES_BOOLEAN + ", " + PROCESS_QUERIES_TF_IDF + ", " + PROCESS_QUERIES_BM25 + "]");
+                        break;
+                    default:
+                        System.out.println("Fehler: Unbekannter parameter " + command + ".");
+                }
             }
-            
-            // Close connection.
-            client.closeConnection();
         } else {
-            System.out.println("Fehler: Parameter Befehl fehlt: [" + INDEX_DOCUMENTS + ", " + PROCESS_QUERIES + "]");
+            System.out.println("Fehler: Erster Parameter fehlt: [" + INDEX_DOCUMENTS + ", " + PROCESS_QUERIES + "]");
         }
     }
     

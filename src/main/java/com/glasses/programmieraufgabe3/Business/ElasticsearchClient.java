@@ -2,19 +2,13 @@ package com.glasses.programmieraufgabe3.Business;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.script.mustache.SearchTemplateRequestBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
@@ -99,24 +93,22 @@ public class ElasticsearchClient {
         relevantIdsString += "]";
         
         // Generate search script.
-        String searchScript = "{\n" +
-                              "  \"query\": {\n" +
-                              "    \"bool\": {\n" +
-                              "      \"should\": {\n" +
-                              "        \"match\": {\n" +
-                              "          \"content\": \"" + searchTerms + "\"\n" +
-                              "        }\n" +
-                              "      },\n" +
-                              "      \"filter\": {\n" +
-                              "        \"terms\": {\n" +
-                              "          \"_id\": " + relevantIdsString + "\n" +
-                              "\n" +
-                              "        }\n" +
-                              "      }\n" +
-                              "    }\n" +
-                              "  }\n" +
-                              "}\n" +
-                              "'";
+        String searchScript = "{" +
+                                "\"query\": {" +
+                                  "\"bool\": {" +
+                                    "\"should\": {" +
+                                      "\"match\": {" +
+                                        "\"content\": \"" + searchTerms + "\"" +
+                                      "}" +
+                                    "}," +
+                                    "\"filter\": {" +
+                                      "\"terms\": {" +
+                                        "\"_id\": " + relevantIdsString +
+                                      "}" +
+                                    "}" +
+                                  "}" +
+                                "}" +
+                              "}";
         
         // Search in Elasticsearch.
         SearchResponse response = new SearchTemplateRequestBuilder(client)

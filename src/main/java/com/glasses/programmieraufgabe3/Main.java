@@ -112,7 +112,7 @@ public class Main {
                 break;
             case Main.INDEX_DOCUMENTS_WITH_STOP_WORD:
                 // Define index name.
-                indexName = "documentsWithStopWord";
+                indexName = "documentswithstopword";
                 break;
         }
         
@@ -131,9 +131,9 @@ public class Main {
                     break;
                 case Main.INDEX_DOCUMENTS_WITH_STOP_WORD:
                     // Create new index.
-                    
+                    client.createIndexForStopWords(indexName, "document");
                     // Index document.
-                    client.index(document.toJSON(), "documentsStopWord", "document", document.getId());
+                    client.index(document.toJSON(), indexName, "document", document.getId());
                     break;
                 default:
                     System.out.println("Fehler: Zweiter Parameter " + havingStopWords + " nicht bekannt.");

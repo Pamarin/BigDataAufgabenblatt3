@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -64,10 +65,61 @@ public class ElasticsearchClient {
     public DeleteIndexResponse delete(String index) {
         System.out.println("Deleting index '" + index + "'.");
         
-        // Delete the given index.
-        DeleteIndexResponse deleteResponse = this.client.admin().indices().delete(new DeleteIndexRequest(index)).actionGet();
+        DeleteIndexResponse deleteResponse = null;
+        
+        try {
+            // Delete the given index.
+            deleteResponse = this.client.admin().indices().delete(new DeleteIndexRequest(index)).actionGet();
+        } catch(Exception ex) {
+            System.out.println("Kein Index zu löschen.");
+        }
         
         return deleteResponse;
+    }
+    
+    public IndexResponse createIndexForStopWords(String index, String type) {
+        String json = "{" +
+                        "\"settings\": {" +
+                          "\"analysis\": {" +
+                            "\"filter\": {" +
+                              "\"english_stop\": {" +
+                                "\"type\":       \"stop\"," +
+                                "\"stopwords\":  \"_english_\"" +
+                              "}," +
+                              "\"english_keywords\": {" +
+                                "\"type\":       \"keyword_marker\"," +
+                                "\"keywords\":   [\"example\"]" +
+                              "}," +
+                              "\"english_stemmer\": {" +
+                                "\"type\":       \"stemmer\"," +
+                                "\"language\":   \"english\"" +
+                              "}," +
+                              "\"english_possessive_stemmer\": {" +
+                                "\"type\":       \"stemmer\"," +
+                                "\"language\":   \"possessive_english\"" +
+                              "}" +
+                            "}," +
+                            "\"analyzer\": {" +
+                              "\"english\": {" +
+                                "\"tokenizer\":  \"standard\"," +
+                                "\"filter\": [" +
+                                  "\"english_possessive_stemmer\"," +
+                                  "\"lowercase\"," +
+                                  "\"english_stop\"," +
+                                  "\"english_keywords\"," +
+                                  "\"english_stemmer\"" +
+                                "]" +
+                              "}" +
+                            "}" +
+                          "}" +
+                        "}" +
+                      "}";
+        
+        IndexRequest indexRequest = new IndexRequest(index, type);
+        indexRequest.source(json);
+        IndexResponse response = this.client.index(indexRequest).actionGet();
+
+        return response;
     }
     
     public IndexResponse index(String json, String index, String type, String id) {

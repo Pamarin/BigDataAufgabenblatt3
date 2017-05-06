@@ -33,7 +33,6 @@ public class Main {
     public static final String PROCESS_QUERIES_TF_IDF = "tfidf";
     public static final String PROCESS_QUERIES_BM25 = "bm25";
     
-    
     public static void main(String[] args) throws IOException, Exception {
         System.out.println("#####################################################");
         System.out.println("#                                                   #");

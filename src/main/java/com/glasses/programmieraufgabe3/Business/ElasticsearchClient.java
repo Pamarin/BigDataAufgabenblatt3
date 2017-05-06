@@ -95,9 +95,6 @@ public class ElasticsearchClient {
                                   "}" +
                                 "}" +
                               "}";
-                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                System.out.println(searchScript);
-                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 break;
             case Main.PROCESS_QUERIES_BOOLEAN:
                 // Change search terms to fit boolean search.

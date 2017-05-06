@@ -1,5 +1,6 @@
 package com.glasses.programmieraufgabe3.Business;
 
+import com.glasses.programmieraufgabe3.Main;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -69,7 +70,7 @@ public class ElasticsearchClient {
         return response;
     }
     
-    public SearchResponse search(String index, String type, String fieldToSearchIn, String searchTerms) {
+    public SearchResponse search(String index, String type, String fieldToSearchIn, String searchTerms, String searchAlgorithm) throws Exception {
         // Query for Elasticsearch.
         // For more information Elasticsearch API query building: https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-search.html
         /*
@@ -80,7 +81,12 @@ public class ElasticsearchClient {
         */
         
         // Generate search script.
-        String searchScript = "{" +
+        String searchScript = "";
+        
+        // Differentiate between different algorithms.
+        switch(searchAlgorithm) {
+            case Main.PROCESS_QUERIES_TF_IDF:
+                searchScript = "{" +
                                 "\"query\":" +
                                 "{" +
                                   "\"match\":" +
@@ -89,6 +95,38 @@ public class ElasticsearchClient {
                                   "}" +
                                 "}" +
                               "}";
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                System.out.println(searchScript);
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                break;
+            case Main.PROCESS_QUERIES_BOOLEAN:
+                // Change search terms to fit boolean search.
+                searchTerms = searchTerms.replace(" ", " AND ");
+                searchScript = "{" +
+                                "\"query\":" +
+                                "{" +
+                                  "\"match\":" +
+                                  "{" +
+                                    "\"content\": \"" + searchTerms + "\"" +
+                                  "}" +
+                                "}" +
+                              "}";
+                break;
+            case Main.PROCESS_QUERIES_BM25:
+                searchScript = "{" +
+                                "\"query\":" +
+                                "{" +
+                                  "\"match\":" +
+                                  "{" +
+                                    "\"content\": \"" + searchTerms + "\"" +
+                                  "}" +
+                                "}" +
+                              "}";
+                throw new Exception("BM25 has not yet been implemented.");
+                //beak;
+            default:
+                throw new Exception("Fehler: Algorithmus " + searchAlgorithm + " nicht bekannt.");
+        }
         
         // Search in Elasticsearch.
         SearchResponse response = new SearchTemplateRequestBuilder(client)

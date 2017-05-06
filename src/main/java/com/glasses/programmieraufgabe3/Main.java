@@ -29,6 +29,10 @@ public class Main {
     // List of possible commands given through the command line.
     static final String INDEX_DOCUMENTS = "index_documents";
     static final String PROCESS_QUERIES = "process_queries";
+    public static final String PROCESS_QUERIES_BOOLEAN = "boolean";
+    public static final String PROCESS_QUERIES_TF_IDF = "tfidf";
+    public static final String PROCESS_QUERIES_BM25 = "bm25";
+    
     
     public static void main(String[] args) throws IOException, Exception {
         System.out.println("#####################################################");
@@ -38,8 +42,9 @@ public class Main {
         System.out.println("#####################################################");
         System.out.println("");
         
+        // Check if one argument has been given.
         if(args.length > 0) {
-            // Get the command from the command line.
+            // Get the first command from the command line.
             String command = args[0];
             
             // Connect to Elasticsearch node.
@@ -48,10 +53,19 @@ public class Main {
             // Start the appriate part.
             switch(args[0]) {
                 case INDEX_DOCUMENTS:
+                    // Index the documents.
                     indexDocuments(client);
                     break;
                 case PROCESS_QUERIES:
-                    processQueries(client);
+                    // Check if two arguments have been given.
+                    if(args.length > 1) {
+                        // Get the second command from command line.
+                        String algorithm = args[1];
+                        // Process the queries.
+                        processQueries(client, algorithm);
+                    } else {
+                        System.out.println("Fehler: Dem ersten Parameter " + PROCESS_QUERIES + " fehlt noch der zweite Parameter Suchart: [" + PROCESS_QUERIES_BOOLEAN + ", " + PROCESS_QUERIES_TF_IDF + ", " + PROCESS_QUERIES_BM25 + "]");
+                    }
                     break;
                 default:
                     System.out.println("Fehler: '" + command + "' ist kein gültiger Befehl.");
@@ -60,7 +74,7 @@ public class Main {
             // Close connection.
             client.closeConnection();
         } else {
-            System.out.println("Fehler: Parameter Befehl fehlt: " + INDEX_DOCUMENTS + " oder " + PROCESS_QUERIES);
+            System.out.println("Fehler: Parameter Befehl fehlt: [" + INDEX_DOCUMENTS + ", " + PROCESS_QUERIES + "]");
         }
     }
     
@@ -150,7 +164,7 @@ public class Main {
         return foundJudgement;
     }
     
-    private static void processQueries(ElasticsearchClient client) throws IOException, Exception {
+    private static void processQueries(ElasticsearchClient client, String searchAlgorithm) throws IOException, Exception {
         System.out.println("Queries verarbeiten.");
         
         // Load queries and judgements.
@@ -163,7 +177,7 @@ public class Main {
         // Execute every query and collect the responses.
         for(Query query : queries) {
             // Query Elasticsearch and get response.
-            SearchResponse response = client.search("documents", "document", "content", query.getTitle());
+            SearchResponse response = client.search("documents", "document", "content", query.getTitle(), searchAlgorithm);
             
             // Create query response.
             QueryResponse queryResponse = new QueryResponse(query, response);

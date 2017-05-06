@@ -124,14 +124,6 @@ public class Main {
             // Parse from tabulator-separated line to Judgements class.
             Judgement judgement = Judgement.parse(line);
             
-            /*
-            // Add to judgements list, if relevant.
-            if(judgement.isRelevance()) {
-                // Add to judgments list.
-                judgements.add(judgement);
-            }
-            */
-            
             // Add to judgments list.
             judgements.add(judgement);
         }

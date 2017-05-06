@@ -1,6 +1,7 @@
 package com.glasses.programmieraufgabe3.Model;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.SearchHit;
 
 /**
  *
@@ -107,12 +108,24 @@ public class QueryResponse {
 
     @Override
     public String toString() {
+        SearchHit[] searchHits = this.response.getHits().getHits();
+        String searchHitsString = "[";
+        for(int i=0; i<searchHits.length; i++) {
+            if(i>0) {
+                searchHitsString += ", ";
+            }
+            searchHitsString += searchHits[i].getId();
+        }
+        searchHitsString += "]";
+        
         return "QueryResponse{" + "query=" + query.getTitle() +
                                 ", tp=" + classificationTP +
                                 ", fp=" + classificationFP +
                                 ", fn=" + classificationFN +
                                 ", precision=" + calculatePrecision() +
                                 ", recall=" + calculateRecall() +
+                                ", hits=" + this.response.getHits().getHits().length +
+                                ", documentIds=" + searchHitsString +
                                 '}';
     }
 }

@@ -35,6 +35,8 @@ public class Main {
     public static final String PROCESS_QUERIES_BOOLEAN = "boolean";
     public static final String PROCESS_QUERIES_TF_IDF = "tfidf";
     public static final String PROCESS_QUERIES_BM25 = "bm25";
+    static final String PROCESS_QUERIES_USING_STOP_WORD_NO = "using_stopword_no";
+    static final String PROCESS_QUERIES_USING_STOP_WORD_YES = "using_stopword_yes";
     
     public static void main(String[] args) throws IOException, Exception {
         System.out.println("#####################################################");
@@ -65,8 +67,16 @@ public class Main {
                     case PROCESS_QUERIES:
                         // Get the second command from command line.
                         String algorithm = args[1];
-                        // Process the queries.
-                        processQueries(client, algorithm);
+                        
+                        // Check if three arguments have been given.
+                        if(args.length > 2) {
+                            // Get the third command from command line.
+                            String usingStopWord = args[2];
+                            // Process the queries.
+                            processQueries(client, algorithm, usingStopWord);
+                        } else {
+                            System.out.println("Fehler: Dritter Parameter fehlt: [" + PROCESS_QUERIES_USING_STOP_WORD_NO + ", " + PROCESS_QUERIES_USING_STOP_WORD_YES + "]");
+                        }
                         break;
                     default:
                         System.out.println("Fehler: '" + command + "' ist kein gültiger Befehl.");
@@ -208,8 +218,19 @@ public class Main {
         return foundJudgement;
     }
     
-    private static void processQueries(ElasticsearchClient client, String searchAlgorithm) throws IOException, Exception {
+    private static void processQueries(ElasticsearchClient client, String searchAlgorithm, String usingStopWord) throws IOException, Exception {
         System.out.println("Queries verarbeiten.");
+        
+        // Index to be used.
+        String index = "";
+        switch(usingStopWord) {
+            case Main.PROCESS_QUERIES_USING_STOP_WORD_NO:
+                index = "documents";
+                break;
+            case Main.PROCESS_QUERIES_USING_STOP_WORD_YES:
+                index = "documentswithstopword";
+                break;
+        }
         
         // Load queries and judgements.
         ArrayList<Query> queries = loadQueries();
@@ -221,7 +242,7 @@ public class Main {
         // Execute every query and collect the responses.
         for(Query query : queries) {
             // Query Elasticsearch and get response.
-            SearchResponse response = client.search("documents", "document", "content", query.getTitle(), searchAlgorithm);
+            SearchResponse response = client.search(index, "document", "content", query.getTitle(), searchAlgorithm);
             
             // Create query response.
             QueryResponse queryResponse = new QueryResponse(query, response);

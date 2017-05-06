@@ -5,9 +5,11 @@ import com.glasses.programmieraufgabe3.Business.FileReader;
 import com.glasses.programmieraufgabe3.Model.Document;
 import com.glasses.programmieraufgabe3.Model.Judgement;
 import com.glasses.programmieraufgabe3.Model.Query;
+import com.glasses.programmieraufgabe3.Model.QueryResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.SearchHit;
 
 /**
  *
@@ -137,6 +139,25 @@ public class Main {
         return judgements;
     }
     
+    private static Judgement findJudgement(ArrayList<Judgement> judgements, String documentId, long queryId) {
+        Judgement foundJudgement = null;
+        
+        // Search for appropriate judgement.
+        for(Judgement judgement : judgements) {
+            // Check if same query id.
+            if(queryId == judgement.getQueryId()) {
+                // Check if same document id.
+                if(documentId.equals(judgement.getDocumentId())) {
+                    // Remember judgement.
+                    foundJudgement = judgement;
+                    break;
+                }
+            }
+        }
+        
+        return foundJudgement;
+    }
+    
     private static void processQueries(ElasticsearchClient client) throws IOException, Exception {
         System.out.println("Queries verarbeiten.");
         
@@ -144,17 +165,52 @@ public class Main {
         ArrayList<Query> queries = loadQueries();
         ArrayList<Judgement> judgements = loadJudgements();
         
-        // Define search terms.
-        String searchTerms = "International Organized Crime";
+        // Remember Elasticsearch results from every query.
+        ArrayList<QueryResponse> responses = new ArrayList<>();
         
-        // Define the indices.
-        ArrayList<String> relevantIds = new ArrayList<>();
-        relevantIds.add("CR93E-1282");
-        relevantIds.add("CR93E-3103");
-        relevantIds.add("CR93E-5796");
+        // Execute every query and collect the responses.
+        for(Query query : queries) {
+            // Query Elasticsearch and get response.
+            SearchResponse response = client.search("documents", "document", "content", query.getTitle());
+            
+            // Create query response.
+            QueryResponse queryResponse = new QueryResponse(query, response);
+            
+            // Get hits from response.
+            SearchHit[] searchHits = response.getHits().getHits();
+            
+            // Compare every hit.
+            for(SearchHit searchHit : searchHits) {
+                // Remember document id.
+                String documentId = searchHit.getId();
+                // Remember query id.
+                long queryId = query.getId();
+                // Find appropriate judgement.
+                Judgement judgement = findJudgement(judgements, documentId, queryId);
+                
+                // Cound classifications.
+                if(judgement == null) {
+                    // Add +1 to FN classification.
+                    queryResponse.addClassificationFN();
+                } else {
+                    if(judgement.isRelevance()) {
+                        // Add +1 to TP classification.
+                        queryResponse.addClassificationTP();
+                    } else {
+                        // Add +1 to FP classification.
+                        queryResponse.addClassificationFP();
+                    }
+                }
+            }
+            
+            // Add query and response to list.
+            responses.add(queryResponse);
+        }
         
-        // Search in Elasticsearch.
-        SearchResponse response = client.search("documents", "document", "title", searchTerms, relevantIds);
-        System.out.println(response);
+        // Output.
+        System.out.println("Anzahl Responses: " + responses.size());
+        for(QueryResponse response : responses) {
+            System.out.println(response);
+        }
     }
 }

@@ -69,6 +69,38 @@ public class ElasticsearchClient {
         return response;
     }
     
+    public SearchResponse search(String index, String type, String fieldToSearchIn, String searchTerms) {
+        // Query for Elasticsearch.
+        // For more information Elasticsearch API query building: https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-search.html
+        /*
+        SearchResponse response = this.client.prepareSearch(index)
+                                             .setTypes(type)
+                                             .setQuery(QueryBuilders.termsQuery(fieldToSearchIn, searchTerms))
+                                             .get();
+        */
+        
+        // Generate search script.
+        String searchScript = "{" +
+                                "\"query\":" +
+                                "{" +
+                                  "\"match\":" +
+                                  "{" +
+                                    "\"content\": \"" + searchTerms + "\"" +
+                                  "}" +
+                                "}" +
+                              "}";
+        
+        // Search in Elasticsearch.
+        SearchResponse response = new SearchTemplateRequestBuilder(client)
+                                        .setScript(searchScript)
+                                        .setScriptType(ScriptType.INLINE)
+                                        .setRequest(new SearchRequest())
+                                        .get()
+                                        .getResponse();
+        
+        return response;
+    }
+    
     public SearchResponse search(String index, String type, String fieldToSearchIn, String searchTerms, List<String> relevantIds) {
         // Query for Elasticsearch.
         // For more information Elasticsearch API query building: https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-search.html

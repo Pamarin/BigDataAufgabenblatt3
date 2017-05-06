@@ -6,16 +6,16 @@ package com.glasses.programmieraufgabe3.Model;
  * @since 2017-05-04
  */
 public class Judgement {
-    private long id;
+    private long queryId;
     private String documentId;
     private boolean relevance;
 
-    public long getId() {
-        return id;
+    public long getQueryId() {
+        return queryId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setQueryId(long queryId) {
+        this.queryId = queryId;
     }
 
     public String getDocumentId() {
@@ -34,8 +34,8 @@ public class Judgement {
         this.relevance = relevance;
     }
     
-    public Judgement(long id, String documentId, boolean relevance) {
-        this.id = id;
+    public Judgement(long queryId, String documentId, boolean relevance) {
+        this.queryId = queryId;
         this.documentId = documentId;
         this.relevance = relevance;
     }
@@ -50,6 +50,6 @@ public class Judgement {
 
     @Override
     public String toString() {
-        return "Judgement{" + "id=" + id + ", documentId=" + documentId + ", relevance=" + relevance + '}';
+        return "Judgement{" + "queryId=" + queryId + ", documentId=" + documentId + ", relevance=" + relevance + '}';
     }
 }

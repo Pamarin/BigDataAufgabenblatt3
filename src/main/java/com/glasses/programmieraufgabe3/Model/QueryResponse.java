@@ -1,5 +1,6 @@
 package com.glasses.programmieraufgabe3.Model;
 
+import java.util.ArrayList;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
 
@@ -93,6 +94,20 @@ public class QueryResponse {
         } else {
             return 0.0;
         }
+    }
+    
+    public static double calculateMeanAveragePrecision(ArrayList<QueryResponse> responses) {
+        // Sum of all precisions.
+        double precisionSum = 0.0;
+        
+        // Run through every response for retrieving the precision.
+        for(QueryResponse response : responses) {
+            // Add precision to sum of precisions.
+            precisionSum += response.calculatePrecision();
+        }
+        
+        // Calculate MAD (Mean Average Precision).
+        return precisionSum / (double)responses.size();
     }
     
     public QueryResponse(Query query, SearchResponse response) {

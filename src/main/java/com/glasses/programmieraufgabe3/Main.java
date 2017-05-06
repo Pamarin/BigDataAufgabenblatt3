@@ -204,5 +204,6 @@ public class Main {
         for(QueryResponse response : responses) {
             System.out.println(response);
         }
+        System.out.println("MAD (Mean Average Precision): " + QueryResponse.calculateMeanAveragePrecision(responses));
     }
 }

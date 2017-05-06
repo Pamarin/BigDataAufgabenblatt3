@@ -60,7 +60,7 @@ public class Main {
                         // Get the second command from command line.
                         String havingStopWord = args[1];
                         // Index the documents.
-                        indexDocuments(client);
+                        indexDocuments(client, havingStopWord);
                         break;
                     case PROCESS_QUERIES:
                         // Get the second command from command line.
@@ -92,7 +92,7 @@ public class Main {
         }
     }
     
-    private static void indexDocuments(ElasticsearchClient client) throws Exception {
+    private static void indexDocuments(ElasticsearchClient client, String havingStopWords) throws Exception {
         System.out.println("Dokumente indexieren.");
         
         // Access file.
@@ -101,13 +101,43 @@ public class Main {
         reader.read(true);
         System.out.println("Gefundene Zeilen: " + reader.getLines().size());
 
+        // Index name.
+        String indexName = "";
+        
+        // Delete existing index.
+        switch(havingStopWords) {
+            case Main.INDEX_DOCUMENTS_WITHOUT_STOP_WORD:
+                // Define index name.
+                indexName = "documents";
+                break;
+            case Main.INDEX_DOCUMENTS_WITH_STOP_WORD:
+                // Define index name.
+                indexName = "documentsWithStopWord";
+                break;
+        }
+        
+        // Delete current index.
+        client.delete(indexName);
+        
         // Iterate through every line.
         for(String line : reader.getLines()) {
             // Parse from JSON to Document class.
             Document document = Document.parse(line);
-
-            // Index document.
-            client.index(document.toJSON(), "documents", "document", document.getId());
+            
+            switch(havingStopWords) {
+                case Main.INDEX_DOCUMENTS_WITHOUT_STOP_WORD:
+                    // Index document.
+                    client.index(document.toJSON(), indexName, "document", document.getId());
+                    break;
+                case Main.INDEX_DOCUMENTS_WITH_STOP_WORD:
+                    // Create new index.
+                    
+                    // Index document.
+                    client.index(document.toJSON(), "documentsStopWord", "document", document.getId());
+                    break;
+                default:
+                    System.out.println("Fehler: Zweiter Parameter " + havingStopWords + " nicht bekannt.");
+            }
         }
     }
     

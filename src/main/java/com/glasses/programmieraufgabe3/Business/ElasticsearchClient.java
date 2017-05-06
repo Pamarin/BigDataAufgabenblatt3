@@ -4,6 +4,8 @@ import com.glasses.programmieraufgabe3.Main;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -57,6 +59,15 @@ public class ElasticsearchClient {
         } else {
             throw new Exception("Connection still open.");
         }
+    }
+    
+    public DeleteIndexResponse delete(String index) {
+        System.out.println("Deleting index '" + index + "'.");
+        
+        // Delete the given index.
+        DeleteIndexResponse deleteResponse = this.client.admin().indices().delete(new DeleteIndexRequest(index)).actionGet();
+        
+        return deleteResponse;
     }
     
     public IndexResponse index(String json, String index, String type, String id) {
